@@ -56,5 +56,23 @@ namespace DBconnect
             connection = new MySqlConnection(ConnString);
             connection.Open();
         }
+        public MySqlDataReader SelectQuery(string sql)
+        {
+            var command = new MySqlCommand { Connection = connection, CommandText = sql };
+            var result = command.ExecuteReader();
+            return result;
+        }
+
+        public int InsertQuery(string sql)
+        {
+            var command = new MySqlCommand { Connection = connection, CommandText = sql };
+            var result = command.ExecuteNonQuery();
+            return result;
+        }
+
+        public void Close()
+        {
+            connection.Close();
+        }
     }
 }
