@@ -70,6 +70,13 @@ namespace DBconnect
             return result;
         }
 
+        public int UpdateQuery(string sql)
+        {
+            var command = new MySqlCommand { Connection = connection, CommandText = sql };
+            var result = command.ExecuteNonQuery();
+            return result;
+        }
+
         public void Close()
         {
             connection.Close();
