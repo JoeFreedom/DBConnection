@@ -57,6 +57,12 @@ namespace DBconnect
             ConnectDB();
         }
 
+        public DBconnection(string host, string database, string port, string username, string pass)
+        {
+            ConnString = "Server=" + host + ";Database=" + database + ";port=" + port + ";User Id=" + username + ";password=" + pass;
+            ConnectDB();
+        }
+
         public void ConnectDB() 
         {
             connection = new MySqlConnection(ConnString);
