@@ -15,6 +15,8 @@ namespace DBconnect
         private readonly string pass;
         private readonly string ConnString;
 
+        public bool isConnect;
+
         public DBconnection()
         {
             using (var file = new StreamReader("dbconnect.cfg"))
@@ -52,10 +54,22 @@ namespace DBconnect
                 }
             }
             ConnString = "Server=" + host + ";Database=" + database + ";port=" + port + ";User Id=" + username + ";password=" + pass;
+            ConnectDB();
+        }
 
+        public void ConnectDB() 
+        {
             connection = new MySqlConnection(ConnString);
             connection.Open();
+            if(connection.Ping())
+            {
+                isConnect = true;
+            } else
+            {
+                isConnect = false;
+            }
         }
+
         public MySqlDataReader SelectQuery(string sql)
         {
             var command = new MySqlCommand { Connection = connection, CommandText = sql };
