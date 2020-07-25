@@ -110,7 +110,7 @@ namespace DBconnect
                 var result = command.ExecuteNonQuery();
                 if(result > 0)
                 {
-                    success?.Invoke("Запись успешно добавленна в БД");
+                    success?.Invoke("Запись успешно добавлена в БД");
                 }
                 else
                 {
