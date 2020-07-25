@@ -4,8 +4,11 @@ using MySql.Data.MySqlClient;
 
 namespace DBconnect
 {
+    public delegate void Message(string message);
     public class DBconnection
     {
+        public event Message success;
+        public event Message error;
         private MySqlConnection connection;
 
         private readonly string host;
@@ -14,8 +17,6 @@ namespace DBconnect
         private readonly string username;
         private readonly string pass;
         private readonly string ConnString;
-
-        public bool isConnect;
 
         public DBconnection()
         {
@@ -67,34 +68,89 @@ namespace DBconnect
         {
             connection = new MySqlConnection(ConnString);
             connection.Open();
-            if(connection.Ping())
+            if (connection.Ping())
             {
-                isConnect = true;
-            } else
+                success?.Invoke("Успешное подключение к БД");
+            }
+            else
             {
-                isConnect = false;
+                error?.Invoke("Нет подключения к БД");
             }
         }
 
         public MySqlDataReader SelectQuery(string sql)
         {
-            var command = new MySqlCommand { Connection = connection, CommandText = sql };
-            var result = command.ExecuteReader();
-            return result;
+            if (connection.Ping())
+            {
+                var command = new MySqlCommand { Connection = connection, CommandText = sql };
+                var result = command.ExecuteReader();
+                if (result != null)
+                {
+                    success?.Invoke("Запрос выполнен");
+                    return result;
+                }
+                else
+                {
+                    error?.Invoke("Запрос в БД выполнить не удалось");
+                    return result;
+                }
+            }
+            else
+            {
+                error?.Invoke("Нет подключения к БД");
+                return null;
+            }
         }
 
         public int InsertQuery(string sql)
         {
-            var command = new MySqlCommand { Connection = connection, CommandText = sql };
-            var result = command.ExecuteNonQuery();
-            return result;
+            if (connection.Ping()) 
+            {
+                var command = new MySqlCommand { Connection = connection, CommandText = sql };
+                var result = command.ExecuteNonQuery();
+                if(result > 0)
+                {
+                    success?.Invoke("Запись успешно добавленна в БД");
+                }
+                else
+                {
+                    error?.Invoke("Не удалось внести запись в БД");
+                }
+                return result;
+            }
+            else
+            {
+                error?.Invoke("Нет подключения к БД");
+                return -1;
+            }     
         }
 
         public int UpdateQuery(string sql)
         {
-            var command = new MySqlCommand { Connection = connection, CommandText = sql };
-            var result = command.ExecuteNonQuery();
-            return result;
+            if (connection.Ping())
+            {
+                var command = new MySqlCommand { Connection = connection, CommandText = sql };
+                var result = command.ExecuteNonQuery();
+                if(result > 0)
+                {
+                    success?.Invoke("Изменения в БД внесены");
+                }
+                else
+                {
+                    error?.Invoke("Не удалось внести изменения в БД");
+                }
+                return result;
+            }
+            else
+            {
+                error?.Invoke("Нет подключения к БД");
+                return -1;
+            }
+        }
+
+        public bool IsConnect()
+        {
+            return connection.Ping();
         }
 
         public void Close()
