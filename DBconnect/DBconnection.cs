@@ -21,6 +21,7 @@ namespace DBconnect
 
         public DBconnection(bool isAsync)
         {
+            Console.WriteLine(Directory.GetCurrentDirectory());
             if (!isAsync)
             {
                 using (var file = new StreamReader("dbconnect.cfg"))
@@ -73,6 +74,7 @@ namespace DBconnect
                     string tempLine;
                     while ((tempLine = file.ReadLine()) != null)
                     {
+
                         tempLine = tempLine.Trim();
                         var index = tempLine.IndexOf('=');
                         if (index < 0)
@@ -115,7 +117,7 @@ namespace DBconnect
 
         public void ConnectDB() 
         {
-            if (connection.Ping())
+            if (connection != null && connection.Ping())
             {
                 error?.Invoke("Подключение уже осуществлено");
                 return;
@@ -136,23 +138,20 @@ namespace DBconnect
         {
             await Task.Run(() =>
             {
-                if (connection.Ping())
+                if (connection != null && connection.Ping())
                 {
                     error?.Invoke("Подключение уже осуществлено");
-                    Console.WriteLine("Подключение уже осуществлено");
                     return;
                 }
                 connection = new MySqlConnection(ConnString);
-                connection.Open();
+                connection.OpenAsync();
                 if (connection.Ping())
                 {
                     success?.Invoke("Успешное подключение к БД");
-                    Console.WriteLine("Успешное подключение к БД");
                 }
                 else
                 {
                     error?.Invoke("Нет подключения к БД");
-                    Console.WriteLine("Нет подключения к БД");
                 }
             });
         }
