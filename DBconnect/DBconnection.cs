@@ -21,7 +21,6 @@ namespace DBconnect
 
         public DBconnection(bool isAsync)
         {
-            Console.WriteLine(Directory.GetCurrentDirectory());
             if (!isAsync)
             {
                 using (var file = new StreamReader("dbconnect.cfg"))
@@ -74,7 +73,6 @@ namespace DBconnect
                     string tempLine;
                     while ((tempLine = file.ReadLine()) != null)
                     {
-
                         tempLine = tempLine.Trim();
                         var index = tempLine.IndexOf('=');
                         if (index < 0)
