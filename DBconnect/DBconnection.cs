@@ -139,6 +139,7 @@ namespace DBconnect
                 if (connection.Ping())
                 {
                     error?.Invoke("Подключение уже осуществлено");
+                    Console.WriteLine("Подключение уже осуществлено");
                     return;
                 }
                 connection = new MySqlConnection(ConnString);
@@ -146,10 +147,12 @@ namespace DBconnect
                 if (connection.Ping())
                 {
                     success?.Invoke("Успешное подключение к БД");
+                    Console.WriteLine("Успешное подключение к БД");
                 }
                 else
                 {
                     error?.Invoke("Нет подключения к БД");
+                    Console.WriteLine("Нет подключения к БД");
                 }
             });
         }
