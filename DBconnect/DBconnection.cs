@@ -57,71 +57,11 @@ namespace DBconnect
                 }
             }
             ConnString = "Server=" + host + ";Database=" + database + ";port=" + port + ";User Id=" + username + ";password=" + pass;
-            ConnectDB();
-        }
-
-        public DBconnection(bool async)
-        {
-            using (var file = new StreamReader("dbconnect.cfg"))
-            {
-                string tempLine;
-                while ((tempLine = file.ReadLine()) != null)
-                {
-                    tempLine = tempLine.Trim();
-                    var index = tempLine.IndexOf('=');
-                    if (index < 0)
-                        continue;
-                    var tempSymbols = tempLine.Substring(index + 1);
-                    var tempVar = tempLine.Substring(0, index);
-                    tempSymbols = tempSymbols.Trim();
-                    tempVar = tempVar.Trim();
-
-                    switch (tempVar)
-                    {
-                        case "host":
-                            host = tempSymbols;
-                            break;
-                        case "database":
-                            database = tempSymbols;
-                            break;
-                        case "port":
-                            port = tempSymbols;
-                            break;
-                        case "username":
-                            username = tempSymbols;
-                            break;
-                        case "pass":
-                            pass = tempSymbols;
-                            break;
-                    }
-                }
-            }
-            ConnString = "Server=" + host + ";Database=" + database + ";port=" + port + ";User Id=" + username + ";password=" + pass;
-            if (async)
-            {
-                ConnectDBAsync();
-            }
-            else
-            {
-                ConnectDB();
-            }
         }
 
         public DBconnection(string host, string database, string port, string username, string pass)
         {
             ConnString = "Server=" + host + ";Database=" + database + ";port=" + port + ";User Id=" + username + ";password=" + pass;
-            ConnectDB();
-        }
-        public DBconnection(string host, string database, string port, string username, string pass, bool async)
-        {
-            ConnString = "Server=" + host + ";Database=" + database + ";port=" + port + ";User Id=" + username + ";password=" + pass;
-            if (async)
-            {
-                ConnectDBAsync();
-            } else
-            {
-                ConnectDB();
-            }
         }
 
         public void ConnectDB() 
@@ -147,18 +87,18 @@ namespace DBconnect
         {
             if (connection != null && connection.Ping())
             {
-                error?.Invoke("Подключение уже осуществлено [async connection]");
+                error?.Invoke("[From async method] Подключение уже осуществлено");
                 return;
             }
             connection = new MySqlConnection(ConnString);
             await connection.OpenAsync();
             if (connection.Ping())
             {
-                success?.Invoke("Успешное подключение к БД [async connection]");
+                success?.Invoke("[From async method] Успешное подключение к БД");
             }
             else
             {
-                error?.Invoke("Нет подключения к БД [async connection]");
+                error?.Invoke("[From async method] Нет подключения к БД");
             }
         }
 
@@ -194,18 +134,18 @@ namespace DBconnect
                 var result = await command.ExecuteReaderAsync();
                 if (result != null)
                 {
-                    success?.Invoke("Запрос выполнен [async query]");
+                    success?.Invoke("[From async method] Запрос выполнен");
                     return result;
                 }
                 else
                 {
-                    error?.Invoke("Запрос в БД выполнить не удалось [async query]");
+                    error?.Invoke("[From async method] Запрос в БД выполнить не удалось");
                     return result;
                 }
             }
             else
             {
-                error?.Invoke("Нет подключения к БД [async query]");
+                error?.Invoke("[From async method] Нет подключения к БД");
                 return null;
             }
         }
@@ -241,17 +181,17 @@ namespace DBconnect
                 var result = await command.ExecuteNonQueryAsync();
                 if (result > 0)
                 {
-                    success?.Invoke("Запись успешно добавлена в БД [async query]");
+                    success?.Invoke("[From async method] Запись успешно добавлена в БД");
                 }
                 else
                 {
-                    error?.Invoke("Не удалось внести запись в БД [async query]");
+                    error?.Invoke("[From async method] Не удалось внести запись в БД");
                 }
                 return result;
             }
             else
             {
-                error?.Invoke("Нет подключения к БД [async query]");
+                error?.Invoke("[From async method] Нет подключения к БД");
                 return -1;
             }
         }
@@ -287,17 +227,17 @@ namespace DBconnect
                 var result = await command.ExecuteNonQueryAsync();
                 if (result > 0)
                 {
-                    success?.Invoke("Изменения в БД внесены [async query]");
+                    success?.Invoke("[From async method] Изменения в БД внесены");
                 }
                 else
                 {
-                    error?.Invoke("Не удалось внести изменения в БД [async query]");
+                    error?.Invoke("[From async method] Не удалось внести изменения в БД");
                 }
                 return result;
             }
             else
             {
-                error?.Invoke("Нет подключения к БД [async query]");
+                error?.Invoke("[From async method] Нет подключения к БД");
                 return -1;
             }
         }
@@ -312,6 +252,7 @@ namespace DBconnect
             if (connection.Ping())
             {
                 connection.Close();
+                success?.Invoke("Соединение закрыто");
             } else
             {
                 error?.Invoke("Соединенине с БД либо уже закрыто, либо его не было");
@@ -322,9 +263,10 @@ namespace DBconnect
             if (connection.Ping())
             {
                 await connection.CloseAsync();
+                success?.Invoke("[From async method] Соединение закрыто");
             } else
             {
-                error?.Invoke("Соединенине с БД либо уже закрыто, либо его не было [async closing]");
+                error?.Invoke("[From async method] Соединенине с БД либо уже закрыто, либо его не было");
             }
         }
     }
