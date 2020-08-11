@@ -258,7 +258,7 @@ namespace DBconnect
                 error?.Invoke("Соединенине с БД либо уже закрыто, либо его не было");
             }
         }
-        public async void CloseAsync()
+        public async Task CloseAsync()
         {
             if (connection.Ping())
             {
