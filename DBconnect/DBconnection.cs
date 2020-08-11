@@ -83,7 +83,7 @@ namespace DBconnect
             }
         }
 
-        public async void ConnectDBAsync()
+        public async Task ConnectDBAsync()
         {
             if (connection != null && connection.Ping())
             {
